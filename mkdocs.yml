@@ -1,10 +1,10 @@
 site_name: Minions Developer Docs
 site_url: https://minions-ai.github.io/minions-docs  # 🔹 Add this for correct link resolution
-repo_url: https://github.com/minions-ai/minions-docs
+repo_url: https://github.com/minions-ai/minions
 docs_dir: docs
 
 theme:
-  name: material  # 🔹 'mkdocs' is the default/basic theme; consider using 'material' for better UI
+  name: material
   features:
     - navigation.expand
     - navigation.sections
