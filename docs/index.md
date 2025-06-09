@@ -24,7 +24,7 @@ The AI ecosystem has rapidly shifted toward **agentic workflows**—systems wher
   The framework follows familiar Spring idioms, making it easy for developers to inject, override, and extend functionality using standard annotations and configuration mechanisms.
 
 - **MCP Compliance**  
-  Minions adheres to the [Model Connector Protocol (MCP)](https://github.com/langchain-ai/langgraph/blob/main/spec/mcp.md), enabling composability, cross-model interoperability, and architectural clarity.
+  Minions adheres to the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction), enabling composability, cross-model interoperability, and architectural clarity.
 
 - **Enterprise-Grade Capabilities**  
   Features like memory privacy, audit hooks, multi-tenant memory isolation, and structured evaluation make Minions a suitable foundation for regulated industries like insurance, healthcare, and finance.
