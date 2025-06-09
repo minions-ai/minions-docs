@@ -415,6 +415,75 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#memory-query-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Query System
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Query System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memoryquery" class="md-nav__link">
+    <span class="md-ellipsis">
+      MemoryQuery
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memoryqueryexpression" class="md-nav__link">
+    <span class="md-ellipsis">
+      MemoryQueryExpression
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-building" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query Building
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query Translation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-query-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Query Patterns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query Strategies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -732,6 +801,143 @@ memoryManager.flush();
 - Model selection for summarization
 - Memory subsystem behavior
 - Query strategy selection</p>
+<h2 id="memory-query-system">Memory Query System</h2>
+<p>The memory query system provides a flexible and expressive way to retrieve messages from memory subsystems. It consists of two main components: <code>MemoryQuery</code> and <code>MemoryQueryExpression</code>.</p>
+<h3 id="memoryquery">MemoryQuery</h3>
+<p><code>MemoryQuery</code> is the main query object for retrieving messages from memory. It supports:
+- Specifying target memory subsystems
+- Setting result limits
+- Defining complex query expressions
+- Backend-agnostic query construction</p>
+<pre><code class="language-java">MemoryQuery query = MemoryQuery.builder()
+    .subsystems(MemorySubsystem.EPISODIC)  // Target specific memory subsystem
+    .limit(10)                             // Limit results
+    .expression(expression)                // Query expression
+    .build();
+</code></pre>
+<h3 id="memoryqueryexpression">MemoryQueryExpression</h3>
+<p><code>MemoryQueryExpression</code> is the base interface for all query expressions. It provides:
+- A method to evaluate messages against the expression
+- Support for logical operations (AND, OR, NOT)
+- A fluent API for building complex expressions</p>
+<p>The framework provides several built-in expression types:</p>
+<ol>
+<li><strong>FieldEqualsExpression</strong></li>
+<li>
+<p>Matches exact field values
+   <code>java
+   Expr.eq("role", MessageRole.USER)</code></p>
+</li>
+<li>
+<p><strong>ContainsKeywordExpression</strong></p>
+</li>
+<li>
+<p>Searches for keywords in text fields
+   <code>java
+   Expr.contains("content", "keyword")</code></p>
+</li>
+<li>
+<p><strong>RangeExpression</strong></p>
+</li>
+<li>
+<p>Filters by time ranges
+   <code>java
+   Expr.after("timestamp", Instant.now().minus(Duration.ofDays(1)))</code></p>
+</li>
+<li>
+<p><strong>MetadataMatchExpression</strong></p>
+</li>
+<li>
+<p>Matches metadata key-value pairs
+   <code>java
+   Expr.metadata("priority", "high")</code></p>
+</li>
+<li>
+<p><strong>VectorSimilarityExpression</strong></p>
+</li>
+<li>
+<p>Performs vector similarity search
+   <code>java
+   Expr.vector(embedding, topK)</code></p>
+</li>
+<li>
+<p><strong>LogicalExpression</strong></p>
+</li>
+<li>Combines expressions with AND, OR, NOT
+   <code>java
+   Expr.and(
+       Expr.eq("role", MessageRole.USER),
+       Expr.contains("content", "keyword")
+   )</code></li>
+</ol>
+<h3 id="query-building">Query Building</h3>
+<p>The <code>QueryBuilder</code> class provides a fluent API for constructing queries:</p>
+<pre><code class="language-java">MemoryQuery query = new QueryBuilder()
+    .role(MessageRole.USER)
+    .scope(MessageScope.CONVERSATION)
+    .keyword(&quot;important&quot;)
+    .after(Instant.now().minus(Duration.ofHours(1)))
+    .entityType(&quot;user&quot;)
+    .conversationId(&quot;conv123&quot;)
+    .metadata(Map.of(&quot;priority&quot;, &quot;high&quot;))
+    .build();
+</code></pre>
+<h3 id="query-translation">Query Translation</h3>
+<p>Queries can be translated to different backend formats:</p>
+<ol>
+<li>
+<p><strong>MongoDB</strong>
+   <code>java
+   Query mongoQuery = mongoQueryTranslator.translate(memoryQuery);</code></p>
+</li>
+<li>
+<p><strong>PostgreSQL</strong>
+   <code>java
+   String sql = postgresQueryTranslator.translate(memoryQuery);</code></p>
+</li>
+<li>
+<p><strong>In-Memory</strong>
+   <code>java
+   List&lt;Message&gt; results = messages.stream()
+       .filter(message -&gt; expression.evaluate(message))
+       .collect(Collectors.toList());</code></p>
+</li>
+</ol>
+<h3 id="common-query-patterns">Common Query Patterns</h3>
+<p>The <code>MemoryQueryUtils</code> class provides utility methods for common query patterns:</p>
+<pre><code class="language-java">// Get last N user messages
+List&lt;Message&gt; userMessages = MemoryQueryUtils.getLastNUserMessages(
+    memoryManager, 5, &quot;conv123&quot;);
+
+// Get last N assistant messages
+List&lt;Message&gt; assistantMessages = MemoryQueryUtils.getLastNAssistantMessages(
+    memoryManager, 5, &quot;conv123&quot;);
+
+// Get entities of specific type
+List&lt;Message&gt; userEntities = MemoryQueryUtils.getEntitiesOfType(
+    memoryManager, &quot;user&quot;);
+</code></pre>
+<h3 id="query-strategies">Query Strategies</h3>
+<p>Query strategies implement the <code>MemoryQueryStrategy</code> interface to provide context-aware querying:</p>
+<ol>
+<li><strong>Agent Strategies</strong></li>
+<li><code>AgentEntityQueryStrategy</code>: Queries entity memory</li>
+<li><code>AgentVectorQueryStrategy</code>: Performs vector similarity search</li>
+<li><code>AgentShortTermQueryStrategy</code>: Queries short-term memory</li>
+<li>
+<p><code>AgentLongTermQueryStrategy</code>: Queries long-term memory</p>
+</li>
+<li>
+<p><strong>Step Strategies</strong></p>
+</li>
+<li><code>StepEntityQueryStrategy</code>: Queries entity memory</li>
+<li><code>StepVectorQueryStrategy</code>: Performs vector similarity search</li>
+<li><code>StepShortTermQueryStrategy</code>: Queries short-term memory</li>
+</ol>
+<p>Each strategy:
+- Implements <code>getMemoryQuery</code> to build appropriate queries
+- Specifies supported memory subsystems
+- Defines context acceptance criteria</p>
 
 
 
