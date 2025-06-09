@@ -63,6 +63,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#evaluation-observability" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -399,6 +404,21 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Evaluation & Observability
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="08%20-%20Evaluation%20%26%20Observability.html" class="md-nav__link md-nav__link--active">
         
@@ -411,6 +431,166 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#memory-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Metrics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Metrics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#performance-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Metrics
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Health
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Monitoring
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Monitoring">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query Monitoring
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Storage Monitoring
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Evaluation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Evaluation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query Evaluation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarization-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summarization Evaluation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Observability Integration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observability Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prometheus-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prometheus Metrics
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grafana-dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      Grafana Dashboards
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Observability
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -545,8 +725,135 @@
   
 
 
-  <h1>Evaluation & Observability</h1>
+<h1 id="evaluation-observability">Evaluation &amp; Observability</h1>
+<p>Minions provides comprehensive evaluation and observability features, including memory-specific metrics and monitoring capabilities.</p>
+<h2 id="memory-metrics">Memory Metrics</h2>
+<h3 id="performance-metrics">Performance Metrics</h3>
+<pre><code class="language-java">@Component
+public class MemoryMetrics {
+    private final MeterRegistry registry;
 
+    public void recordMemoryOperation(
+            String operation,
+            MemorySubsystem subsystem,
+            long duration) {
+        registry.timer(&quot;memory.operation&quot;, 
+            &quot;operation&quot;, operation,
+            &quot;subsystem&quot;, subsystem.name())
+            .record(duration, TimeUnit.MILLISECONDS);
+    }
+}
+</code></pre>
+<h3 id="memory-health">Memory Health</h3>
+<pre><code class="language-java">@Component
+public class MemoryHealthIndicator implements HealthIndicator {
+    private final MemoryManager memoryManager;
+
+    @Override
+    public Health health() {
+        return Health.builder()
+            .withDetail(&quot;episodic&quot;, checkSubsystem(MemorySubsystem.EPISODIC))
+            .withDetail(&quot;vector&quot;, checkSubsystem(MemorySubsystem.VECTOR))
+            .build();
+    }
+}
+</code></pre>
+<h2 id="memory-monitoring">Memory Monitoring</h2>
+<h3 id="query-monitoring">Query Monitoring</h3>
+<pre><code class="language-java">@Aspect
+@Component
+public class MemoryQueryMonitor {
+    @Around(&quot;execution(* com.minionslab.core.memory.MemoryManager.query(..))&quot;)
+    public Object monitorQuery(ProceedingJoinPoint pjp) {
+        // Monitor query performance
+        // Track query patterns
+        // Alert on anomalies
+    }
+}
+</code></pre>
+<h3 id="storage-monitoring">Storage Monitoring</h3>
+<pre><code class="language-java">@Aspect
+@Component
+public class MemoryStorageMonitor {
+    @Around(&quot;execution(* com.minionslab.core.memory.MemoryManager.store(..))&quot;)
+    public Object monitorStorage(ProceedingJoinPoint pjp) {
+        // Monitor storage operations
+        // Track storage patterns
+        // Alert on capacity issues
+    }
+}
+</code></pre>
+<h2 id="memory-evaluation">Memory Evaluation</h2>
+<h3 id="query-evaluation">Query Evaluation</h3>
+<pre><code class="language-java">@Component
+public class MemoryQueryEvaluator {
+    public QueryEvaluationResult evaluateQuery(
+            MemoryQuery query,
+            List&lt;Message&gt; results) {
+        return QueryEvaluationResult.builder()
+            .relevance(calculateRelevance(results))
+            .completeness(calculateCompleteness(results))
+            .build();
+    }
+}
+</code></pre>
+<h3 id="summarization-evaluation">Summarization Evaluation</h3>
+<pre><code class="language-java">@Component
+public class MemorySummarizationEvaluator {
+    public SummarizationEvaluationResult evaluateSummary(
+            List&lt;Message&gt; original,
+            Message summary) {
+        return SummarizationEvaluationResult.builder()
+            .coverage(calculateCoverage(original, summary))
+            .accuracy(calculateAccuracy(original, summary))
+            .build();
+    }
+}
+</code></pre>
+<h2 id="observability-integration">Observability Integration</h2>
+<h3 id="prometheus-metrics">Prometheus Metrics</h3>
+<pre><code class="language-yaml">management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+</code></pre>
+<h3 id="grafana-dashboards">Grafana Dashboards</h3>
+<pre><code class="language-json">{
+  &quot;dashboard&quot;: {
+    &quot;panels&quot;: [
+      {
+        &quot;title&quot;: &quot;Memory Operations&quot;,
+        &quot;type&quot;: &quot;graph&quot;,
+        &quot;targets&quot;: [
+          {
+            &quot;expr&quot;: &quot;rate(memory_operation_seconds_count[5m])&quot;,
+            &quot;legendFormat&quot;: &quot;{{operation}} - {{subsystem}}&quot;
+          }
+        ]
+      }
+    ]
+  }
+}
+</code></pre>
+<h2 id="testing-observability">Testing Observability</h2>
+<pre><code class="language-java">@Test
+void testMemoryMetrics() {
+    MemoryManager manager = new MemoryManager(memories, strategies);
+    manager.store(MemorySubsystem.EPISODIC, message);
+
+    // Verify metrics
+    assertThat(registry.find(&quot;memory.operation&quot;)
+        .tag(&quot;operation&quot;, &quot;store&quot;)
+        .tag(&quot;subsystem&quot;, &quot;EPISODIC&quot;)
+        .timer())
+        .isNotNull();
+}
+</code></pre>
 <p>Minions supports observability hooks throughout the agent lifecycle:</p>
 <ul>
 <li>Step-level evaluations</li>

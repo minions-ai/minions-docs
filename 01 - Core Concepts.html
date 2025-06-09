@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#what-is-an-agent" class="md-skip">
+        <a href="#core-concepts" class="md-skip">
           Skip to content
         </a>
       
@@ -250,6 +250,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -281,6 +283,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -613,8 +617,7 @@
   
 
 
-  <h1>Core Concepts</h1>
-
+<h1 id="core-concepts">Core Concepts</h1>
 <p>Understanding the foundational elements of Minions is essential before diving into its deeper architecture. This section introduces the two most important constructs: <strong>Agents</strong> and <strong>Recipes</strong>.</p>
 <hr />
 <h3 id="what-is-an-agent">What is an Agent?</h3>
@@ -631,7 +634,22 @@
 <p><strong>Step Execution</strong>: The agent traverses its step graph, making decisions, calling models, and interacting with tools as needed.</p>
 </li>
 <li>
-<p><strong>Memory Update</strong>: After each step, the agent records new information, summarizes if needed, and updates relevant memories.</p>
+<p><strong>Memory Management</strong>: The agent maintains multiple memory subsystems:</p>
+<ul>
+<li>Episodic memory for chronological event storage</li>
+<li>Vector memory for semantic similarity search</li>
+<li>Short-term memory for active context</li>
+<li>Long-term memory for persistent knowledge</li>
+</ul>
+</li>
+<li>
+<p><strong>Memory Summarization</strong>: After each step, the agent:</p>
+<ul>
+<li>Queries relevant memory based on context</li>
+<li>Generates summaries using model calls</li>
+<li>Updates appropriate memory subsystems</li>
+<li>Maintains memory efficiency through summarization</li>
+</ul>
 </li>
 <li>
 <p><strong>Completion</strong>: The agent completes once the graph reaches a terminal node or a completion condition is met.</p>
@@ -640,11 +658,11 @@
 <p>Agents are <strong>MCP-compliant</strong> and <strong>traceable</strong>, allowing developers to monitor execution, review decision points, and integrate with observability tooling.</p>
 <hr />
 <h3 id="what-is-a-recipe">What is a Recipe?</h3>
-<p>A <strong>Recipe</strong> is a declarative blueprint for constructing an agent. Rather than configuring agents imperatively through code, developers define recipes that describe the agent’s identity, structure, and behavior.</p>
+<p>A <strong>Recipe</strong> is a declarative blueprint for constructing an agent. Rather than configuring agents imperatively through code, developers define recipes that describe the agent's identity, structure, and behavior.</p>
 <p>A recipe includes:</p>
 <ul>
 <li>
-<p><strong>System Prompt</strong> – The initial set of instructions or framing context for the agent’s behavior.</p>
+<p><strong>System Prompt</strong> – The initial set of instructions or framing context for the agent's behavior.</p>
 </li>
 <li>
 <p><strong>Goal</strong> – The task or objective the agent is trying to achieve.</p>
@@ -653,7 +671,13 @@
 <p><strong>Step Graph</strong> – A flow structure of logical steps the agent executes in order, conditionally, or iteratively.</p>
 </li>
 <li>
-<p><strong>Memory Strategy</strong> – Defines how the agent stores, summarizes, and retrieves contextual information across steps.</p>
+<p><strong>Memory Configuration</strong> – Defines how the agent manages memory:</p>
+<ul>
+<li>Memory subsystem selection and configuration</li>
+<li>Query strategy configuration</li>
+<li>Summarization settings</li>
+<li>Persistence strategy selection</li>
+</ul>
 </li>
 <li>
 <p><strong>Toolchain and Hooks</strong> (optional) – Tools the agent can call and hooks for evaluation, logging, or transformation.</p>

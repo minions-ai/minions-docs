@@ -63,6 +63,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#privacy-governance" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -421,6 +426,21 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Privacy & Governance
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="09%20-%20Privacy%20%26%20Governance.html" class="md-nav__link md-nav__link--active">
         
@@ -433,6 +453,109 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#memory-privacy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Privacy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Privacy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Isolation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#privacy-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Privacy Controls
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Governance
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Governance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#audit-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      Audit Logging
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-retention" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Retention
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compliance-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compliance Features
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-privacy-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Privacy Controls
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -545,15 +668,105 @@
   
 
 
-  <h1>Privacy & Governance</h1>
+<h1 id="privacy-governance">Privacy &amp; Governance</h1>
+<p>Minions provides built-in support for privacy and governance requirements, particularly in memory management and data handling.</p>
+<h2 id="memory-privacy">Memory Privacy</h2>
+<h3 id="data-isolation">Data Isolation</h3>
+<p>Memory subsystems support multi-tenant isolation:</p>
+<pre><code class="language-java">@Configuration
+public class MemoryPrivacyConfig {
+    @Bean
+    public MemoryManager memoryManager(
+            List&lt;Memory&lt;MemoryContext, Message&gt;&gt; memories,
+            PrivacyConfig privacyConfig) {
+        return new MemoryManager(memories, strategies, privacyConfig);
+    }
+}
+</code></pre>
+<h3 id="privacy-controls">Privacy Controls</h3>
+<pre><code class="language-java">public class PrivacyConfig {
+    private final boolean enableDataIsolation;
+    private final boolean enableAuditLogging;
+    private final boolean enableDataRetention;
 
-<p>Minions was designed with regulated industries in mind.</p>
-<ul>
-<li><strong>PII Filters</strong>: Redact or transform sensitive information before it enters models or tools.</li>
-<li><strong>Multi-tenant Memory Isolation</strong>: Each tenant has scoped memory and tool access.</li>
-<li><strong>Audit Hooks</strong>: Every agent action is traceable and timestamped.</li>
-<li><strong>Local LLM Integration</strong>: Optional fallback to local models for privacy-sensitive steps.</li>
-</ul>
+    // Privacy controls for memory operations
+    public boolean canAccessMemory(String tenantId, MemorySubsystem subsystem) {
+        // Check access permissions
+    }
+
+    public boolean canStoreData(String tenantId, Message message) {
+        // Check storage permissions
+    }
+}
+</code></pre>
+<h2 id="memory-governance">Memory Governance</h2>
+<h3 id="audit-logging">Audit Logging</h3>
+<p>All memory operations are logged for audit purposes:</p>
+<pre><code class="language-java">@Component
+public class MemoryAuditLogger {
+    public void logMemoryOperation(
+            String operation,
+            String tenantId,
+            MemorySubsystem subsystem,
+            Message message) {
+        // Log memory operation
+    }
+}
+</code></pre>
+<h3 id="data-retention">Data Retention</h3>
+<p>Memory subsystems support configurable retention policies:</p>
+<pre><code class="language-java">@Configuration
+public class RetentionConfig {
+    @Bean
+    public RetentionPolicy memoryRetentionPolicy() {
+        return RetentionPolicy.builder()
+            .episodicMemoryRetention(Duration.ofDays(30))
+            .vectorMemoryRetention(Duration.ofDays(90))
+            .build();
+    }
+}
+</code></pre>
+<h2 id="compliance-features">Compliance Features</h2>
+<ol>
+<li><strong>Data Isolation</strong></li>
+<li>Tenant-based memory isolation</li>
+<li>Subsystem-level access control</li>
+<li>
+<p>Cross-tenant data protection</p>
+</li>
+<li>
+<p><strong>Audit Trail</strong></p>
+</li>
+<li>Memory operation logging</li>
+<li>Access pattern tracking</li>
+<li>
+<p>Compliance reporting</p>
+</li>
+<li>
+<p><strong>Data Retention</strong></p>
+</li>
+<li>Configurable retention periods</li>
+<li>Automated data cleanup</li>
+<li>Retention policy enforcement</li>
+</ol>
+<h2 id="testing-privacy-controls">Testing Privacy Controls</h2>
+<pre><code class="language-java">@Test
+void testMemoryPrivacy() {
+    PrivacyConfig config = new PrivacyConfig(true, true, true);
+    MemoryManager manager = new MemoryManager(memories, strategies, config);
+
+    // Test data isolation
+    assertFalse(manager.canAccessMemory(&quot;tenant1&quot;, &quot;tenant2&quot;));
+
+    // Test audit logging
+    verify(auditLogger).logMemoryOperation(
+        eq(&quot;store&quot;),
+        eq(&quot;tenant1&quot;),
+        eq(MemorySubsystem.EPISODIC),
+        any(Message.class)
+    );
+}
+</code></pre>
 
 
 

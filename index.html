@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#why-minions" class="md-skip">
+        <a href="#minions-framework" class="md-skip">
           Skip to content
         </a>
       
@@ -226,6 +226,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -258,6 +260,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -278,6 +282,15 @@
   <a href="#key-design-principles" class="md-nav__link">
     <span class="md-ellipsis">
       Key Design Principles
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Architecture
     </span>
   </a>
   
@@ -605,8 +618,7 @@
   
 
 
-  <h1>Home</h1>
-
+<h1 id="minions-framework">Minions Framework</h1>
 <p><strong>Minions</strong> is an extensible, MCP-compliant agentic AI framework written in Java and built using idiomatic Spring practices. Designed from the ground up with the principles of <strong>extensibility</strong>, <strong>traceability</strong>, and <strong>enterprise readiness</strong>, Minions provides a solid foundation for building and orchestrating autonomous AI agents in regulated and complex environments.</p>
 <p>At its core, Minions follows the <strong>Open/Closed Principle</strong>: the system is open for extension but closed for modification. Whether you're building a ReAct-style reasoning agent, a planner-executor-observer pipeline, or a bespoke recipe for your enterprise workflow, Minions enables it without changing the underlying framework.</p>
 <h2 id="why-minions">Why Minions?</h2>
@@ -616,6 +628,8 @@
 <li><strong>Modular architecture</strong> that can be expanded with Spring Beans</li>
 <li><strong>Privacy and governance by design</strong></li>
 <li><strong>Idiomatic support for lifecycle management, configuration, and testing</strong></li>
+<li><strong>Multi-tiered memory architecture</strong> with pluggable strategies for querying, persisting, retrieving and flusing the memory modules</li>
+<li><strong>Enterprise-grade persistence</strong> through integration with Spring Data</li>
 </ul>
 <h2 id="key-design-principles">Key Design Principles</h2>
 <ul>
@@ -636,19 +650,36 @@
   Features like memory privacy, audit hooks, multi-tenant memory isolation, and structured evaluation make Minions a suitable foundation for regulated industries like insurance, healthcare, and finance.</p>
 </li>
 </ul>
+<h2 id="memory-architecture">Memory Architecture</h2>
+<p>Minions implements a sophisticated multi-tiered memory system:</p>
+<ul>
+<li><strong>Episodic Memory</strong>: Chronological event storage</li>
+<li><strong>Vector Memory</strong>: Semantic similarity search</li>
+<li><strong>Short-Term Memory</strong>: Active context management</li>
+<li><strong>Long-Term Memory</strong>: Persistent knowledge storage</li>
+</ul>
+<p>Each memory subsystem is managed through pluggable strategies for:
+- Query execution
+- Persistence
+- Summarization
+- Privacy and governance</p>
 <h2 id="agent-recipes">Agent Recipes</h2>
-<p>Every agent in Minions is instantiated from a <strong>Recipe</strong>. A recipe defines the agent’s purpose and structure:</p>
+<p>Every agent in Minions is instantiated from a <strong>Recipe</strong>. A recipe defines the agent's purpose and structure:</p>
 <ul>
 <li>Its <strong>system prompt</strong> and <strong>goal</strong></li>
 <li>The <strong>step graph</strong> that outlines its thought/action flow</li>
-<li>Its <strong>memory strategy</strong>, specifying what the agent remembers and when</li>
+<li>Its <strong>memory configuration</strong>, specifying:</li>
+<li>Memory subsystem selection</li>
+<li>Query strategy configuration</li>
+<li>Summarization settings</li>
+<li>Persistence strategy</li>
 <li>Optional toolchains and observers</li>
 </ul>
 <p>Different types of recipes are available out-of-the-box, including:
 - <code>ReActAgentRecipe</code>
 - <code>PlannerExecutorObserverRecipe</code>
 - And more custom agent types</p>
-<p>We’ll dive deeper into recipes, step graphs, and memory strategies in the following sections.</p>
+<p>We'll dive deeper into recipes, step graphs, and memory strategies in the following sections.</p>
 
 
 

@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#chains-are-used-in" class="md-skip">
+        <a href="#process-chains" class="md-skip">
           Skip to content
         </a>
       
@@ -316,6 +316,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -348,6 +350,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -365,9 +369,60 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#memory-processors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Processors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Processors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-summarizer-processor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Summarizer Processor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-query-processors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Query Processors
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#defining-a-processor" class="md-nav__link">
     <span class="md-ellipsis">
       Defining a Processor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#processor-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Processor Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-processors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Processors
     </span>
   </a>
   
@@ -598,17 +653,48 @@
   
 
 
-  <h1>Process Chains</h1>
-
-<p>Minions uses the <strong>Chain of Responsibility</strong> pattern to handle agent behaviors in a modular way.</p>
+<h1 id="process-chains">Process Chains</h1>
+<p>Minions uses the <strong>Chain of Responsibility</strong> pattern to handle agent behaviors in a modular way. This pattern allows for flexible composition of behaviors and easy extension of functionality.</p>
 <h2 id="chains-are-used-in">Chains are used in:</h2>
 <ul>
 <li><strong>Step Completion Evaluation</strong></li>
-<li><strong>Memory Summarization</strong></li>
+<li><strong>Memory Management</strong></li>
+<li>Memory Summarization</li>
+<li>Memory Query Execution</li>
+<li>Memory Persistence</li>
 <li><strong>Tool Selection</strong></li>
 <li><strong>Custom Output Evaluation</strong></li>
 </ul>
 <p>Each chain is made of <code>Processor&lt;T extends ProcessContext&gt;</code> implementations that can be prioritized and conditionally applied.</p>
+<h2 id="memory-processors">Memory Processors</h2>
+<h3 id="memory-summarizer-processor">Memory Summarizer Processor</h3>
+<pre><code class="language-java">@Component
+public class MemorySummarizerProcessor implements Processor&lt;AgentContext&gt; {
+    private final ModelCallService modelCallService;
+
+    @Override
+    public AgentContext process(AgentContext input) {
+        // Query memory based on context
+        // Generate summaries using model calls
+        // Store summaries in appropriate subsystems
+        return input;
+    }
+}
+</code></pre>
+<h3 id="memory-query-processors">Memory Query Processors</h3>
+<pre><code class="language-java">@Component
+public class StepVectorQueryStrategy implements MemoryQueryStrategy {
+    @Override
+    public MemoryQuery getMemoryQuery(ProcessContext context) {
+        // Build and return memory query
+    }
+
+    @Override
+    public List&lt;MemorySubsystem&gt; getSupportedSubsystem() {
+        return List.of(MemorySubsystem.VECTOR);
+    }
+}
+</code></pre>
 <h2 id="defining-a-processor">Defining a Processor</h2>
 <pre><code class="language-java">@Component
 public class MaxModelCallCountProcessor
@@ -617,6 +703,46 @@ public class MaxModelCallCountProcessor
     @Override
     public StepCompletionOutcome doProcess(StepGraphCompletionContext input) {
         // Custom logic
+    }
+}
+</code></pre>
+<h2 id="processor-configuration">Processor Configuration</h2>
+<p>Processors can be configured through:</p>
+<ol>
+<li><strong>Spring Configuration</strong></li>
+</ol>
+<pre><code class="language-java">@Configuration
+public class ProcessorConfig {
+    @Bean
+    public Processor&lt;AgentContext&gt; memorySummarizerProcessor(ModelCallService modelCallService) {
+        return new MemorySummarizerProcessor(modelCallService);
+    }
+}
+</code></pre>
+<ol>
+<li><strong>Customizers</strong></li>
+</ol>
+<pre><code class="language-java">@Component
+public class MemoryProcessorCustomizer implements ProcessorCustomizer&lt;MemorySummarizerProcessor&gt; {
+    @Override
+    public void customize(MemorySummarizerProcessor processor) {
+        // Custom configuration
+    }
+}
+</code></pre>
+<h2 id="testing-processors">Testing Processors</h2>
+<pre><code class="language-java">@ExtendWith(MockitoExtension.class)
+class MemorySummarizerProcessorTest {
+    @Mock
+    private AgentContext context;
+    @Mock
+    private ModelCallService modelCallService;
+
+    @Test
+    void testProcess() {
+        MemorySummarizerProcessor processor = new MemorySummarizerProcessor(modelCallService);
+        AgentContext result = processor.process(context);
+        // Verify behavior
     }
 }
 </code></pre>

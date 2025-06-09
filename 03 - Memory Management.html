@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#memory-types" class="md-skip">
+        <a href="#memory-management" class="md-skip">
           Skip to content
         </a>
       
@@ -294,6 +294,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -326,6 +328,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -334,27 +338,78 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#memory-types" class="md-nav__link">
+  <a href="#memory-subsystems" class="md-nav__link">
     <span class="md-ellipsis">
-      Memory Types
+      Memory Subsystems
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#memory-strategies" class="md-nav__link">
+  <a href="#memory-query-strategies" class="md-nav__link">
     <span class="md-ellipsis">
-      Memory Strategies
+      Memory Query Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Query Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-based-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step-based Strategies
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent-based-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent-based Strategies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Operations
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#memory-query-dsl" class="md-nav__link">
+  <a href="#memory-persistence" class="md-nav__link">
     <span class="md-ellipsis">
-      Memory Query DSL
+      Memory Persistence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-summarization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Summarization
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
     </span>
   </a>
   
@@ -607,34 +662,76 @@
   
 
 
-  <h1>Memory Management</h1>
-
+<h1 id="memory-management">Memory Management</h1>
 <p>Memory is a first-class concept in Minions. It gives agents the ability to remember context, recall facts, and summarize experiences across steps.</p>
-<h2 id="memory-types">Memory Types</h2>
+<h2 id="memory-subsystems">Memory Subsystems</h2>
+<p>Minions implements a multi-tiered memory architecture:</p>
 <ul>
-<li><strong>Chat Memory</strong>: Stores ongoing interactions (user, assistant, system messages).</li>
-<li><strong>Step-local Memory</strong>: Temporary memory scoped to a single step.</li>
-<li><strong>Long-Term Memory</strong>: Structured storage for facts, retrieved through semantic or attribute-based queries.</li>
+<li><strong>Episodic Memory</strong>: Stores sequences of events and experiences in chronological order</li>
+<li><strong>Vector Memory</strong>: Stores semantic representations of messages for similarity-based retrieval</li>
+<li><strong>Short-Term Memory</strong>: Maintains recent context and active working memory</li>
+<li><strong>Long-Term Memory</strong>: Stores persistent knowledge and facts across conversations</li>
 </ul>
-<h2 id="memory-strategies">Memory Strategies</h2>
-<p>Memory behavior is pluggable via <code>MemoryStrategy</code> interfaces:</p>
+<h2 id="memory-query-strategies">Memory Query Strategies</h2>
+<p>Memory querying is implemented through pluggable strategies that determine how to retrieve information:</p>
+<h3 id="step-based-strategies">Step-based Strategies</h3>
 <ul>
-<li><strong>Append</strong>: Simply add new messages to memory.</li>
-<li><strong>Windowed</strong>: Keep only the latest N messages.</li>
-<li><strong>Summarize</strong>: Condense older memory into summaries.</li>
-<li><strong>Flush and Rebuild</strong>: Clear old memory and retain only key state.</li>
+<li><strong>StepVectorQueryStrategy</strong>: Handles vector-based queries within step context</li>
+<li><strong>StepShortTermQueryStrategy</strong>: Manages short-term memory queries for steps</li>
+<li><strong>StepEntityQueryStrategy</strong>: Handles entity-based queries within step context</li>
 </ul>
-<p>You can define your own strategy by implementing <code>MemoryStrategy&lt;T extends ProcessContext&gt;</code> and wiring it via Spring.</p>
-<h2 id="memory-query-dsl">Memory Query DSL</h2>
-<p>Minions provides a DSL to express queries over memory:</p>
-<pre><code class="language-java">MemoryQuery query = MemoryQuery.builder()
-    .expression(ExprUtil.getUserMessagesExpression(&quot;C1&quot;)
-        .and(Expr.contains(&quot;content&quot;, &quot;Hello&quot;))
-        .and(Expr.metadata(&quot;entityType&quot;, &quot;testEntity&quot;)))
+<h3 id="agent-based-strategies">Agent-based Strategies</h3>
+<ul>
+<li><strong>AgentVectorQueryStrategy</strong>: Manages vector-based queries at agent level</li>
+<li><strong>AgentShortTermQueryStrategy</strong>: Handles short-term memory queries for agents</li>
+<li><strong>AgentLongTermQueryStrategy</strong>: Manages long-term memory queries for agents</li>
+<li><strong>AgentEntityQueryStrategy</strong>: Handles entity-based queries at agent level</li>
+</ul>
+<h2 id="memory-operations">Memory Operations</h2>
+<p>The <code>MemoryManager</code> coordinates memory operations across subsystems:</p>
+<pre><code class="language-java">// Store messages in specific memory subsystem
+memoryManager.store(MemorySubsystem.EPISODIC, message);
+
+// Query memory using DSL
+MemoryQuery query = MemoryQuery.builder()
+    .expression(Expr.eq(&quot;conversationId&quot;, &quot;C1&quot;))
     .limit(10)
     .build();
+List&lt;Message&gt; results = memoryManager.query(query);
+
+// Retrieve specific message
+Message message = memoryManager.retrieve(&quot;messageId&quot;);
+
+// Flush memory
+memoryManager.flush();
 </code></pre>
-<p>This allows agents to retrieve only relevant subsets of memory for each step.</p>
+<h2 id="memory-persistence">Memory Persistence</h2>
+<p>Memory persistence is handled through pluggable strategies:</p>
+<ul>
+<li><strong>InMemoryPersistence</strong>: Default strategy for development and testing</li>
+<li><strong>PostgresPersistence</strong>: Production-ready persistence using PostgreSQL</li>
+<li><strong>Custom Persistence</strong>: Implement <code>PersistenceStrategy</code> for custom storage</li>
+</ul>
+<h2 id="memory-summarization">Memory Summarization</h2>
+<p>The <code>MemorySummarizerProcessor</code> handles memory summarization:</p>
+<ol>
+<li>Queries relevant memory based on conversation context</li>
+<li>Uses model calls to generate summaries</li>
+<li>Stores summaries in appropriate memory subsystems</li>
+<li>Maintains memory efficiency by condensing older information</li>
+</ol>
+<h2 id="configuration">Configuration</h2>
+<p>Memory behavior is configured through:</p>
+<pre><code class="language-java">SummarizationConfig config = SummarizationConfig.builder()
+    .inputMessageLimit(10)
+    .modelConfig(modelConfig)
+    .build();
+</code></pre>
+<p>This allows fine-tuning of:
+- Message limits for summarization
+- Model selection for summarization
+- Memory subsystem behavior
+- Query strategy selection</p>
 
 
 
