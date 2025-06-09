@@ -404,19 +404,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#memory-compliance" class="md-nav__link">
+  <a href="#current-implementation" class="md-nav__link">
     <span class="md-ellipsis">
-      Memory Compliance
+      Current Implementation
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Memory Compliance">
+    <nav class="md-nav" aria-label="Current Implementation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#memory-operations" class="md-nav__link">
+  <a href="#memory-system" class="md-nav__link">
     <span class="md-ellipsis">
-      Memory Operations
+      Memory System
     </span>
   </a>
   
@@ -437,18 +437,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#compliance-requirements" class="md-nav__link">
+  <a href="#planned-mcp-compliance" class="md-nav__link">
     <span class="md-ellipsis">
-      Compliance Requirements
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-compliance" class="md-nav__link">
-    <span class="md-ellipsis">
-      Testing Compliance
+      Planned MCP Compliance
     </span>
   </a>
   
@@ -636,73 +627,55 @@
 
 
 <h1 id="mcp-compliance">MCP Compliance</h1>
-<p>Minions adheres to the <a href="https://github.com/langchain-ai/langgraph/blob/main/spec/mcp.md">Model Connector Protocol (MCP)</a>, ensuring compatibility with other MCP-compliant systems and tools.</p>
-<h2 id="memory-compliance">Memory Compliance</h2>
-<h3 id="memory-operations">Memory Operations</h3>
-<p>All memory operations follow MCP specifications:</p>
-<pre><code class="language-java">// MCP-compliant memory query
+<p>Minions is designed to be compatible with the <a href="https://github.com/langchain-ai/langgraph/blob/main/spec/mcp.md">Model Connector Protocol (MCP)</a>, with ongoing work to achieve full compliance.</p>
+<h2 id="current-implementation">Current Implementation</h2>
+<h3 id="memory-system">Memory System</h3>
+<p>The memory system is designed with MCP compatibility in mind:</p>
+<pre><code class="language-java">// Memory query with standard fields
 MemoryQuery query = MemoryQuery.builder()
-    .expression(Expr.mcp(&quot;conversationId&quot;, &quot;C1&quot;))
+    .subsystems(MemorySubsystem.EPISODIC)
     .limit(10)
+    .expression(Expr.eq(&quot;conversationId&quot;, &quot;C1&quot;))
     .build();
 
-// MCP-compliant memory storage
+// Message with standard metadata
 Message message = Message.builder()
     .content(&quot;content&quot;)
-    .metadata(&quot;mcp:type&quot;, &quot;user_message&quot;)
+    .metadata(&quot;type&quot;, &quot;user_message&quot;)
     .build();
 </code></pre>
 <h3 id="memory-subsystems">Memory Subsystems</h3>
-<p>Each memory subsystem implements MCP interfaces:</p>
-<pre><code class="language-java">public class EpisodicMemory implements Memory&lt;MemoryContext, Message&gt;, McpCompliant {
+<p>Memory subsystems follow a modular design that can be extended for MCP compliance:</p>
+<pre><code class="language-java">public class EpisodicMemory implements Memory&lt;MemoryContext, Message&gt; {
     @Override
-    public McpMetadata getMcpMetadata() {
-        return McpMetadata.builder()
-            .type(&quot;episodic&quot;)
-            .version(&quot;1.0&quot;)
-            .build();
+    public MemorySubsystem getMemorySubsystem() {
+        return MemorySubsystem.EPISODIC;
     }
 }
 </code></pre>
-<h2 id="compliance-requirements">Compliance Requirements</h2>
+<h2 id="planned-mcp-compliance">Planned MCP Compliance</h2>
 <ol>
 <li><strong>Memory Operations</strong></li>
-<li>All memory queries must use MCP-compliant expressions</li>
-<li>Memory storage must include MCP metadata</li>
+<li>[ ] Implement MCP-compliant expression types</li>
+<li>[ ] Add MCP metadata handling</li>
 <li>
-<p>Memory retrieval must respect MCP limits</p>
+<p>[ ] Support MCP-specific query patterns</p>
 </li>
 <li>
 <p><strong>Memory Subsystems</strong></p>
 </li>
-<li>Each subsystem must implement McpCompliant interface</li>
-<li>Subsystems must provide MCP metadata</li>
+<li>[ ] Add MCP interface implementations</li>
+<li>[ ] Implement MCP metadata providers</li>
 <li>
-<p>Subsystems must handle MCP-specific operations</p>
+<p>[ ] Support MCP-specific operations</p>
 </li>
 <li>
 <p><strong>Memory Persistence</strong></p>
 </li>
-<li>Persistence strategies must store MCP metadata</li>
-<li>Data formats must follow MCP specifications</li>
-<li>Query languages must support MCP expressions</li>
+<li>[ ] Add MCP metadata storage</li>
+<li>[ ] Support MCP data formats</li>
+<li>[ ] Implement MCP query language support</li>
 </ol>
-<h2 id="testing-compliance">Testing Compliance</h2>
-<pre><code class="language-java">@Test
-void testMcpCompliance() {
-    MemoryManager manager = new MemoryManager(memories, strategies);
-
-    // Test MCP-compliant query
-    MemoryQuery query = createMcpQuery();
-    List&lt;Message&gt; results = manager.query(query);
-    assertMcpCompliant(results);
-
-    // Test MCP-compliant storage
-    Message message = createMcpMessage();
-    manager.store(MemorySubsystem.EPISODIC, message);
-    assertMcpCompliant(message);
-}
-</code></pre>
 
 
 
