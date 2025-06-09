@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#components" class="md-skip">
+        <a href="#step-graph" class="md-skip">
           Skip to content
         </a>
       
@@ -272,6 +272,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -304,6 +306,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -321,9 +325,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#memory-aware-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory-Aware Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#step-execution-flow" class="md-nav__link">
     <span class="md-ellipsis">
       Step Execution Flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Integration
     </span>
   </a>
   
@@ -607,30 +629,92 @@
   
 
 
-  <h1>Step Graph</h1>
-
+<h1 id="step-graph">Step Graph</h1>
 <p>A <strong>Step Graph</strong> defines the structured flow of logic an agent follows to reach its goal. Unlike ad hoc prompt chaining, Minions formalizes execution paths using a graph of steps connected by transitions.</p>
 <h2 id="components">Components</h2>
 <ul>
-<li><strong>Step</strong>: A unit of logic or decision. A step can invoke a model, execute a tool call, or make a transition decision.</li>
-<li><strong>StepGraphDefinition</strong>: Declarative definition of steps and their transitions.</li>
-<li><strong>TransitionStrategy</strong>: Defines how the agent determines the next step. Can be sequential, conditional, or dynamic.</li>
-<li><strong>Start Step / Terminal Step</strong>: Every graph has an entry point and can define one or more terminal states.</li>
+<li><strong>Step</strong>: A unit of logic or decision. A step can:</li>
+<li>Invoke a model</li>
+<li>Execute a tool call</li>
+<li>Query or update memory</li>
+<li>Make a transition decision</li>
+<li><strong>StepGraphDefinition</strong>: Declarative definition of steps and their transitions</li>
+<li><strong>TransitionStrategy</strong>: Defines how the agent determines the next step</li>
+<li>Sequential transitions</li>
+<li>Conditional transitions</li>
+<li>Dynamic transitions based on memory state</li>
+<li><strong>Start Step / Terminal Step</strong>: Every graph has an entry point and can define one or more terminal states</li>
 </ul>
+<h2 id="memory-aware-steps">Memory-Aware Steps</h2>
+<p>Steps can interact with memory subsystems:</p>
+<pre><code class="language-java">@Component
+public class MemoryAwareStep implements Step {
+    private final MemoryManager memoryManager;
+
+    @Override
+    public StepResult execute(StepContext context) {
+        // Query memory
+        List&lt;Message&gt; memory = memoryManager.query(context);
+
+        // Store results
+        memoryManager.store(MemorySubsystem.EPISODIC, result);
+
+        return StepResult.builder()
+            .outcome(StepCompletionOutcome.COMPLETE)
+            .build();
+    }
+}
+</code></pre>
 <h2 id="step-execution-flow">Step Execution Flow</h2>
 <ol>
-<li>Agent starts at the defined start step.</li>
-<li>Executes step logic: e.g., prompts the model, triggers a tool, processes memory.</li>
-<li>Determines the next step using a transition strategy.</li>
-<li>Repeats until a terminal step is reached or a completion condition is satisfied.</li>
+<li>Agent starts at the defined start step</li>
+<li>Executes step logic:</li>
+<li>Prompts the model</li>
+<li>Triggers a tool</li>
+<li>Queries memory subsystems</li>
+<li>Processes memory results</li>
+<li>Determines the next step using a transition strategy</li>
+<li>Repeats until a terminal step is reached or a completion condition is satisfied</li>
 </ol>
+<h2 id="memory-integration">Memory Integration</h2>
+<p>Steps can integrate with memory in several ways:</p>
+<ol>
+<li><strong>Memory Query</strong></li>
+</ol>
+<pre><code class="language-java">MemoryQuery query = MemoryQuery.builder()
+    .expression(Expr.eq(&quot;conversationId&quot;, context.getConversationId()))
+    .limit(10)
+    .build();
+List&lt;Message&gt; results = memoryManager.query(query);
+</code></pre>
+<ol>
+<li><strong>Memory Storage</strong></li>
+</ol>
+<pre><code class="language-java">memoryManager.store(MemorySubsystem.EPISODIC, message);
+memoryManager.store(MemorySubsystem.VECTOR, message);
+</code></pre>
+<ol>
+<li><strong>Memory Summarization</strong></li>
+</ol>
+<pre><code class="language-java">@Autowired
+private MemorySummarizerProcessor summarizer;
+
+public StepResult execute(StepContext context) {
+    summarizer.process(context);
+    // Continue with step logic
+}
+</code></pre>
 <h2 id="customizing-step-graphs">Customizing Step Graphs</h2>
 <p>Minions supports a Definition/Customizer pattern:</p>
 <ul>
-<li><strong>Definition</strong> defines the logic and structure.</li>
-<li><strong>Customizers</strong> allow injection of additional behavior, transitions, or overrides without modifying the core.</li>
+<li><strong>Definition</strong> defines the logic and structure</li>
+<li><strong>Customizers</strong> allow injection of additional behavior:</li>
+<li>Memory query strategies</li>
+<li>Memory summarization rules</li>
+<li>Persistence configurations</li>
+<li>Transitions based on memory state</li>
 </ul>
-<p>This allows default agent flows to be extended in context-aware ways—e.g., adding a retry step only in certain environments.</p>
+<p>This allows default agent flows to be extended in context-aware ways—e.g., adding memory-aware retry steps or custom memory processing logic.</p>
 
 
 

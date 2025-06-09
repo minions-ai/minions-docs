@@ -63,6 +63,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#testing-debugging" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -487,6 +492,21 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Testing & Debugging
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="12%20-%20Testing%20%26%20Debugging.html" class="md-nav__link md-nav__link--active">
         
@@ -499,6 +519,115 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unit-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unit Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unit Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-memory-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Memory Components
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Memory Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-memory-query-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Memory Query Strategies
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-memory-summarization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Memory Summarization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-memory-persistence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Memory Persistence
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-memory-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Memory Chain
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-memory-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging Memory Issues
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -545,14 +674,113 @@
   
 
 
-  <h1>Testing & Debugging</h1>
+<h1 id="testing-debugging">Testing &amp; Debugging</h1>
+<h2 id="unit-testing">Unit Testing</h2>
+<h3 id="testing-memory-components">Testing Memory Components</h3>
+<h4 id="testing-memory-query-strategies">Testing Memory Query Strategies</h4>
+<pre><code class="language-java">@ExtendWith(MockitoExtension.class)
+class StepVectorQueryStrategyTest {
+    @Mock
+    private StepContext stepContext;
 
-<ul>
-<li>Unit test Steps, Recipes, and Chains using JUnit + Spring Boot Test</li>
-<li>Mock model responses and tool outputs</li>
-<li>View memory snapshots between steps</li>
-<li>Trace execution via built-in logging topics</li>
-</ul>
+    @BeforeEach
+    void setUp() {
+        strategy = new StepVectorQueryStrategy();
+    }
+
+    @Test
+    void testGetMemoryQueryReturnsValidQuery() {
+        MemoryQuery query = strategy.getMemoryQuery(stepContext);
+        assertNotNull(query);
+        assertNotNull(query.getExpression());
+    }
+
+    @Test
+    void testAcceptsStepContext() {
+        assertTrue(strategy.accepts(stepContext));
+        assertFalse(strategy.accepts(mock(ProcessContext.class)));
+    }
+}
+</code></pre>
+<h4 id="testing-memory-summarization">Testing Memory Summarization</h4>
+<pre><code class="language-java">@ExtendWith(MockitoExtension.class)
+class MemorySummarizerProcessorTest {
+    @Mock
+    private AgentContext agentContext;
+    @Mock
+    private MemoryManager memoryManager;
+    @Mock
+    private ModelCallService modelCallService;
+
+    @BeforeEach
+    void setUp() {
+        processor = new MemorySummarizerProcessor(modelCallService);
+        when(agentContext.getMemoryManager()).thenReturn(memoryManager);
+    }
+
+    @Test
+    void testDoProcessQueriesMemoryAndStoresMessages() {
+        List&lt;Message&gt; memoryMessages = List.of(message1, message2);
+        when(memoryManager.query(any(MemoryQuery.class))).thenReturn(memoryMessages);
+
+        processor.process(agentContext);
+
+        verify(memoryManager).query(any(MemoryQuery.class));
+        verify(memoryManager).storeAll(anyList(), eq(MemorySubsystem.EPISODIC));
+        verify(memoryManager).storeAll(anyList(), eq(MemorySubsystem.VECTOR));
+    }
+}
+</code></pre>
+<h3 id="testing-memory-persistence">Testing Memory Persistence</h3>
+<pre><code class="language-java">@Test
+void testPostgresPersistence() {
+    PersistenceStrategy strategy = new PostgresPersistenceStrategy(dataSource);
+    Message message = createTestMessage();
+
+    strategy.store(message);
+    Message retrieved = strategy.retrieve(message.getId());
+
+    assertEquals(message.getId(), retrieved.getId());
+    assertEquals(message.getContent(), retrieved.getContent());
+}
+</code></pre>
+<h2 id="integration-testing">Integration Testing</h2>
+<h3 id="testing-memory-chain">Testing Memory Chain</h3>
+<pre><code class="language-java">@Test
+void testMemoryChain() {
+    MemoryManager manager = new MemoryManager(memories, queryStrategies);
+    Message message = createTestMessage();
+
+    manager.store(MemorySubsystem.EPISODIC, message);
+    Message retrieved = manager.retrieve(message.getId());
+
+    assertNotNull(retrieved);
+    assertEquals(message.getId(), retrieved.getId());
+}
+</code></pre>
+<h2 id="debugging-memory-issues">Debugging Memory Issues</h2>
+<ol>
+<li><strong>Memory Query Issues</strong>:</li>
+<li>Check query expressions</li>
+<li>Verify memory subsystem configuration</li>
+<li>
+<p>Inspect query strategy selection</p>
+</li>
+<li>
+<p><strong>Summarization Issues</strong>:</p>
+</li>
+<li>Verify model call configuration</li>
+<li>Check input message limits</li>
+<li>
+<p>Inspect summary storage</p>
+</li>
+<li>
+<p><strong>Persistence Issues</strong>:</p>
+</li>
+<li>Check database connectivity</li>
+<li>Verify schema configuration</li>
+<li>Inspect transaction handling</li>
+</ol>
 
 
 

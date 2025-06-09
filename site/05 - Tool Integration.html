@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#defining-a-tool" class="md-skip">
+        <a href="#tool-integration" class="md-skip">
           Skip to content
         </a>
       
@@ -338,6 +338,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -370,6 +372,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -387,9 +391,36 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#memory-aware-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory-Aware Tools
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tool-usage-flow" class="md-nav__link">
     <span class="md-ellipsis">
       Tool Usage Flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-integration-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Integration Points
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Tools
     </span>
   </a>
   
@@ -598,22 +629,106 @@
   
 
 
-  <h1>Tool Integration</h1>
-
-<p>Agents often rely on tools to gather data, make external API calls, or trigger workflows.</p>
+<h1 id="tool-integration">Tool Integration</h1>
+<p>Agents often rely on tools to gather data, make external API calls, or trigger workflows. Tools can also interact with memory subsystems to store and retrieve information.</p>
 <h2 id="defining-a-tool">Defining a Tool</h2>
 <p>A tool is a Spring Bean implementing <code>Tool&lt;TInput, TOutput&gt;</code>. It must define:</p>
 <ul>
 <li>The <strong>name</strong> and <strong>input schema</strong></li>
 <li>Execution logic (usually async)</li>
 <li>Optionally: tool metadata and dynamic arguments</li>
+<li>Memory integration points</li>
 </ul>
+<h2 id="memory-aware-tools">Memory-Aware Tools</h2>
+<p>Tools can interact with memory subsystems:</p>
+<pre><code class="language-java">@Component
+public class MemoryAwareTool implements Tool&lt;ToolInput, ToolOutput&gt; {
+    private final MemoryManager memoryManager;
+
+    @Override
+    public ToolOutput execute(ToolInput input) {
+        // Query memory for context
+        List&lt;Message&gt; context = memoryManager.query(input.getContext());
+
+        // Execute tool logic
+        ToolOutput output = process(input, context);
+
+        // Store results in memory
+        memoryManager.store(MemorySubsystem.EPISODIC, output.toMessage());
+
+        return output;
+    }
+}
+</code></pre>
 <h2 id="tool-usage-flow">Tool Usage Flow</h2>
 <ol>
-<li>Step issues a tool call request.</li>
-<li>Tool resolves parameters and executes logic.</li>
-<li>Output is passed to the agent and can be stored in memory or used for reasoning.</li>
+<li>Step issues a tool call request</li>
+<li>Tool resolves parameters and executes logic:</li>
+<li>Queries memory for context</li>
+<li>Performs tool-specific operations</li>
+<li>Stores results in memory</li>
+<li>Output is passed to the agent and can be:</li>
+<li>Stored in memory subsystems</li>
+<li>Used for reasoning</li>
+<li>Summarized for long-term storage</li>
 </ol>
+<h2 id="memory-integration-points">Memory Integration Points</h2>
+<p>Tools can integrate with memory at several points:</p>
+<ol>
+<li><strong>Pre-execution</strong></li>
+</ol>
+<pre><code class="language-java">// Query memory for context
+MemoryQuery query = MemoryQuery.builder()
+    .expression(Expr.eq(&quot;toolId&quot;, toolId))
+    .limit(5)
+    .build();
+List&lt;Message&gt; context = memoryManager.query(query);
+</code></pre>
+<ol>
+<li><strong>Post-execution</strong></li>
+</ol>
+<pre><code class="language-java">// Store tool results
+Message result = Message.builder()
+    .content(output.toString())
+    .metadata(&quot;toolId&quot;, toolId)
+    .build();
+memoryManager.store(MemorySubsystem.EPISODIC, result);
+</code></pre>
+<ol>
+<li><strong>Error Handling</strong></li>
+</ol>
+<pre><code class="language-java">try {
+    return execute(input);
+} catch (Exception e) {
+    // Store error in memory
+    Message error = Message.builder()
+        .content(e.getMessage())
+        .metadata(&quot;error&quot;, true)
+        .build();
+    memoryManager.store(MemorySubsystem.EPISODIC, error);
+    throw e;
+}
+</code></pre>
+<h2 id="testing-tools">Testing Tools</h2>
+<pre><code class="language-java">@ExtendWith(MockitoExtension.class)
+class MemoryAwareToolTest {
+    @Mock
+    private MemoryManager memoryManager;
+
+    @Test
+    void testExecute() {
+        MemoryAwareTool tool = new MemoryAwareTool(memoryManager);
+        ToolInput input = createTestInput();
+
+        when(memoryManager.query(any())).thenReturn(List.of());
+        ToolOutput output = tool.execute(input);
+
+        verify(memoryManager).query(any());
+        verify(memoryManager).store(eq(MemorySubsystem.EPISODIC), any());
+        assertNotNull(output);
+    }
+}
+</code></pre>
 
 
 

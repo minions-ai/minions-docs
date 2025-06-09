@@ -63,6 +63,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#spring-integration" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -377,6 +382,21 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Spring Integration
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="07%20-%20Spring%20Integration.html" class="md-nav__link md-nav__link--active">
         
@@ -389,6 +409,94 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#memory-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-subsystems" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Subsystems
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query Strategies
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#persistence-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Persistence Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auto-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Auto-Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Support
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -545,8 +653,92 @@
   
 
 
-  <h1>Spring Integration</h1>
+<h1 id="spring-integration">Spring Integration</h1>
+<p>Minions is built on Spring Boot, making it easy to integrate with existing Spring applications and leverage Spring's dependency injection and configuration capabilities.</p>
+<h2 id="memory-configuration">Memory Configuration</h2>
+<h3 id="memory-subsystems">Memory Subsystems</h3>
+<pre><code class="language-java">@Configuration
+public class MemoryConfig {
+    @Bean
+    public Memory&lt;MemoryContext, Message&gt; episodicMemory() {
+        return new EpisodicMemory();
+    }
 
+    @Bean
+    public Memory&lt;MemoryContext, Message&gt; vectorMemory() {
+        return new VectorMemory();
+    }
+
+    @Bean
+    public MemoryManager memoryManager(
+            List&lt;Memory&lt;MemoryContext, Message&gt;&gt; memories,
+            List&lt;MemoryQueryStrategy&gt; strategies) {
+        return new MemoryManager(memories, strategies);
+    }
+}
+</code></pre>
+<h3 id="query-strategies">Query Strategies</h3>
+<pre><code class="language-java">@Configuration
+public class QueryStrategyConfig {
+    @Bean
+    public MemoryQueryStrategy stepVectorQueryStrategy() {
+        return new StepVectorQueryStrategy();
+    }
+
+    @Bean
+    public MemoryQueryStrategy agentLongTermQueryStrategy() {
+        return new AgentLongTermQueryStrategy();
+    }
+}
+</code></pre>
+<h3 id="persistence-configuration">Persistence Configuration</h3>
+<pre><code class="language-java">@Configuration
+public class PersistenceConfig {
+    @Bean
+    public PersistenceStrategy postgresPersistenceStrategy(DataSource dataSource) {
+        return new PostgresPersistenceStrategy(dataSource);
+    }
+}
+</code></pre>
+<h2 id="auto-configuration">Auto-Configuration</h2>
+<p>Minions provides auto-configuration for common components:</p>
+<pre><code class="language-java">@Configuration
+@ConditionalOnProperty(name = &quot;minions.memory.enabled&quot;, havingValue = &quot;true&quot;)
+public class MemoryAutoConfiguration {
+    @Bean
+    @ConditionalOnMissingBean
+    public MemoryManager memoryManager() {
+        // Default configuration
+    }
+}
+</code></pre>
+<h2 id="custom-configuration">Custom Configuration</h2>
+<p>Override default configurations using Spring properties:</p>
+<pre><code class="language-yaml">minions:
+  memory:
+    enabled: true
+    subsystems:
+      episodic:
+        enabled: true
+      vector:
+        enabled: true
+    persistence:
+      type: postgres
+      schema: minions
+</code></pre>
+<h2 id="testing-support">Testing Support</h2>
+<p>Spring provides testing utilities for memory components:</p>
+<pre><code class="language-java">@SpringBootTest
+class MemoryIntegrationTest {
+    @Autowired
+    private MemoryManager memoryManager;
+
+    @Test
+    void testMemoryOperations() {
+        // Test memory operations
+    }
+}
+</code></pre>
 <p>Minions is built around idiomatic Spring patterns:</p>
 <ul>
 <li>Use <code>@Component</code> to register custom steps, processors, tools, strategies</li>

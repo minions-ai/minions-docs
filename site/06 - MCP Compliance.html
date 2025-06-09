@@ -63,6 +63,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#mcp-compliance" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -355,6 +360,21 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    MCP Compliance
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="06%20-%20MCP%20Compliance.html" class="md-nav__link md-nav__link--active">
         
@@ -367,6 +387,76 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#memory-compliance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Compliance
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Compliance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Operations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-subsystems" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Subsystems
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compliance-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compliance Requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-compliance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Compliance
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -545,16 +635,74 @@
   
 
 
-  <h1>MCP Compliance</h1>
+<h1 id="mcp-compliance">MCP Compliance</h1>
+<p>Minions adheres to the <a href="https://github.com/langchain-ai/langgraph/blob/main/spec/mcp.md">Model Connector Protocol (MCP)</a>, ensuring compatibility with other MCP-compliant systems and tools.</p>
+<h2 id="memory-compliance">Memory Compliance</h2>
+<h3 id="memory-operations">Memory Operations</h3>
+<p>All memory operations follow MCP specifications:</p>
+<pre><code class="language-java">// MCP-compliant memory query
+MemoryQuery query = MemoryQuery.builder()
+    .expression(Expr.mcp(&quot;conversationId&quot;, &quot;C1&quot;))
+    .limit(10)
+    .build();
 
-<p>Minions adheres to the <a href="https://github.com/langchain-ai/langgraph/blob/main/spec/mcp.md">Model Connector Protocol (MCP)</a>:</p>
-<ul>
-<li>Agent Recipes define system prompts and goals</li>
-<li>Step Graphs enable structured orchestration</li>
-<li>Memory strategies respect MCP’s memory boundaries</li>
-<li>Tool calls are structured and interoperable</li>
-</ul>
-<p>This makes Minions compatible with emerging standards in agent orchestration and allows potential future interop with platforms like LangGraph.</p>
+// MCP-compliant memory storage
+Message message = Message.builder()
+    .content(&quot;content&quot;)
+    .metadata(&quot;mcp:type&quot;, &quot;user_message&quot;)
+    .build();
+</code></pre>
+<h3 id="memory-subsystems">Memory Subsystems</h3>
+<p>Each memory subsystem implements MCP interfaces:</p>
+<pre><code class="language-java">public class EpisodicMemory implements Memory&lt;MemoryContext, Message&gt;, McpCompliant {
+    @Override
+    public McpMetadata getMcpMetadata() {
+        return McpMetadata.builder()
+            .type(&quot;episodic&quot;)
+            .version(&quot;1.0&quot;)
+            .build();
+    }
+}
+</code></pre>
+<h2 id="compliance-requirements">Compliance Requirements</h2>
+<ol>
+<li><strong>Memory Operations</strong></li>
+<li>All memory queries must use MCP-compliant expressions</li>
+<li>Memory storage must include MCP metadata</li>
+<li>
+<p>Memory retrieval must respect MCP limits</p>
+</li>
+<li>
+<p><strong>Memory Subsystems</strong></p>
+</li>
+<li>Each subsystem must implement McpCompliant interface</li>
+<li>Subsystems must provide MCP metadata</li>
+<li>
+<p>Subsystems must handle MCP-specific operations</p>
+</li>
+<li>
+<p><strong>Memory Persistence</strong></p>
+</li>
+<li>Persistence strategies must store MCP metadata</li>
+<li>Data formats must follow MCP specifications</li>
+<li>Query languages must support MCP expressions</li>
+</ol>
+<h2 id="testing-compliance">Testing Compliance</h2>
+<pre><code class="language-java">@Test
+void testMcpCompliance() {
+    MemoryManager manager = new MemoryManager(memories, strategies);
+
+    // Test MCP-compliant query
+    MemoryQuery query = createMcpQuery();
+    List&lt;Message&gt; results = manager.query(query);
+    assertMcpCompliant(results);
+
+    // Test MCP-compliant storage
+    Message message = createMcpMessage();
+    manager.store(MemorySubsystem.EPISODIC, message);
+    assertMcpCompliant(message);
+}
+</code></pre>
 
 
 
