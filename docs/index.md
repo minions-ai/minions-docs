@@ -1,65 +1,60 @@
-# Minions Framework
+# Minions: An Extensible Agentic AI Framework for Java
 
-**Minions** is an extensible, MCP-compliant agentic AI framework written in Java and built using idiomatic Spring practices. Designed from the ground up with the principles of **extensibility**, **traceability**, and **enterprise readiness**, Minions provides a solid foundation for building and orchestrating autonomous AI agents in regulated and complex environments.
+**Minions** is a powerful, MCP-compliant agentic AI framework designed for the enterprise Java ecosystem. Built with idiomatic Spring practices, it provides a robust foundation for creating and orchestrating autonomous AI agents in complex and regulated environments.
 
-At its core, Minions follows the **Open/Closed Principle**: the system is open for extension but closed for modification. Whether you're building a ReAct-style reasoning agent, a planner-executor-observer pipeline, or a bespoke recipe for your enterprise workflow, Minions enables it without changing the underlying framework.
+The framework is architected around a core philosophy:
+
+> **The Open/Closed Principle:** The system is **open for extension** but **closed for modification**.
+
+This means you can build anything from a simple ReAct-style agent to a sophisticated planner-executor pipeline without ever needing to alter the core framework code.
+
+---
 
 ## Why Minions?
 
-The AI ecosystem has rapidly shifted toward **agentic workflows**—systems where autonomous agents reason, plan, act, and reflect over multiple steps. While many open-source frameworks offer this in Python, Minions is one of the few that brings this capability to the **enterprise Java ecosystem** with full support for:
+While many agentic frameworks exist for Python, Minions uniquely brings this cutting-edge capability to enterprise Java development. It's designed from the ground up to support the demands of modern, secure, and scalable applications.
 
-- **Spring Boot auto-configuration and injection**
-- **Modular architecture** that can be expanded with Spring Beans
-- **Privacy and governance by design**
-- **Idiomatic support for lifecycle management, configuration, and testing**
-- **Multi-tiered memory architecture** with pluggable strategies for querying, persisting, retrieving and flusing the memory modules
-- **Enterprise-grade persistence** through integration with Spring Data
+- **Idiomatic Spring Integration:** Leverages Spring Boot auto-configuration, dependency injection, and familiar idioms for seamless development.
+- **Modular & Extensible:** Easily add new components—tools, memory systems, or agent steps—as standard Spring Beans.
+- **Governance by Design:** Built with features like audit hooks, multi-tenant data isolation, and memory privacy for regulated industries.
+- **Multi-Tiered Memory:** Features a sophisticated memory architecture with pluggable strategies for querying, persistence, and summarization.
+- **Enterprise-Grade Persistence:** Integrates seamlessly with Spring Data for robust, scalable data storage.
 
-## Key Design Principles
+---
 
-- **Extensibility First**  
-  Minions uses design patterns like *Definition/Customizer*, *Chain of Responsibility*, and *Factory Registry* to allow seamless plug-in of new components—steps, tools, memories, processors—without modifying the core.
+## Core Design Principles
 
-- **Idiomatic Spring Integration**  
-  The framework follows familiar Spring idioms, making it easy for developers to inject, override, and extend functionality using standard annotations and configuration mechanisms.
+- **Extensibility First** Minions utilizes proven design patterns, such as the _Factory Registry_ and _Chain of Responsibility_, to ensure seamless integration of custom components.
 
-- **MCP Compliance**  
-  Minions adheres to the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction), enabling composability, cross-model interoperability, and architectural clarity.
+- **MCP Compliance** Adherence to the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) ensures architectural clarity, composability, and interoperability between different models and tools.
 
-- **Enterprise-Grade Capabilities**  
-  Features like memory privacy, audit hooks, multi-tenant memory isolation, and structured evaluation make Minions a suitable foundation for regulated industries like insurance, healthcare, and finance.
+- **Enterprise Readiness** With features like structured evaluation and memory management designed for privacy, Minions is ready for deployment in finance, healthcare, and insurance.
 
-## Memory Architecture
 
-Minions implements a sophisticated multi-tiered memory system:
+---
 
-- **Episodic Memory**: Chronological event storage
-- **Vector Memory**: Semantic similarity search
-- **Short-Term Memory**: Active context management
-- **Long-Term Memory**: Persistent knowledge storage
+## Sophisticated Memory Architecture
 
-Each memory subsystem is managed through pluggable strategies for:
-- Query execution
-- Persistence
-- Summarization
-- Privacy and governance
+Minions features a pluggable, multi-tiered memory system that you can customize to your needs. Out of the box, it provides a powerful layered approach:
+
+- **Short-Term Memory:** Manages the active context for immediate tasks.
+- **Episodic Memory:** Stores a chronological history of events and interactions.
+- **Vector Memory:** Enables semantic search over vast amounts of information.
+- **Long-Term Memory:** Provides persistent, long-term knowledge storage.
+
+Each subsystem is managed by pluggable strategies for **querying**, **persistence**, **summarization**, and **privacy**, giving you full control over how your agent remembers and forgets.
+
+---
 
 ## Agent Recipes
 
-Every agent in Minions is instantiated from a **Recipe**. A recipe defines the agent's purpose and structure:
+Every agent in Minions is configured using a **Recipe**. A recipe is a blueprint that defines the agent's behavior and capabilities.
 
-- Its **system prompt** and **goal**
-- The **step graph** that outlines its thought/action flow
-- Its **memory configuration**, specifying:
-  - Memory subsystem selection
-  - Query strategy configuration
-  - Summarization settings
-  - Persistence strategy
-- Optional toolchains and observers
+A recipe specifies:
 
-Different types of recipes are available out-of-the-box, including:
-- `ReActAgentRecipe`
-- `PlannerExecutorObserverRecipe`
-- And more custom agent types
+- The agent's **system prompt** and ultimate **goal**.
+- The **step graph**, which outlines its reasoning and action flow.
+- Its complete **memory configuration**, including which subsystems to use and how they behave.
+- The **toolchains** and **observers** available to the agent.
 
-We'll dive deeper into recipes, step graphs, and memory strategies in the following sections.
+Minions includes several pre-built recipes to get you started, such as `ReActAgentRecipe` and `PlannerExecutorObserverRecipe`, with a clear path to creating your own.
